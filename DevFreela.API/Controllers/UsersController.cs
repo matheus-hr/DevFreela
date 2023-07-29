@@ -1,4 +1,6 @@
 ﻿using DevFreela.API.Models;
+using DevFreela.Application.InputModels;
+using DevFreela.Application.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DevFreela.API.Controllers
@@ -6,22 +8,29 @@ namespace DevFreela.API.Controllers
     [Route("api/users")]
     public class UsersController : ControllerBase
     {
+        private readonly IUserService _userService;
 
-        public UsersController(ExampleClass exampleClass)
+        public UsersController(IUserService userService)
         {
-            //exampleClass.Name = "Updated At UsersController";
+            _userService = userService;
         }
 
         [HttpGet("{id}")]
         public IActionResult GetById(int id)
         {
+            var user = _userService.GetUser(id);
+
+            if(user == null) 
+                return NotFound();
+
             return Ok();
         }
 
         [HttpPost]
-        public IActionResult Post([FromBody] CreateUserModel createUserModel)
+        public IActionResult Post([FromBody] CreateUserInputModel inputModel)
         {
-            return CreatedAtAction(nameof(GetById), new { Id = 1 }, createUserModel);
+            var id = _userService.Create(inputModel);
+            return CreatedAtAction(nameof(GetById), new { Id = id }, inputModel);
         }
 
         [HttpPut("{id}/login")]
