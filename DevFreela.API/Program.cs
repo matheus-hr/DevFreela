@@ -2,6 +2,7 @@ using DevFreela.API.Models;
 using DevFreela.Application.Services.Implementations;
 using DevFreela.Application.Services.Interfaces;
 using DevFreela.Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,7 +19,8 @@ builder.Services.Configure<OpeningTimeOption>(builder.Configuration.GetSection("
 builder.Services.AddScoped<ExampleClass>(e => new ExampleClass { Name = "Initial Stage" });
 
 //Inejção de Dependencia para as Classes Services da camada Application tenham acesso a base de dados na camada Infrastructure -> Persistence
-builder.Services.AddSingleton<DevFreelaDbContext>();
+var connectionString = builder.Configuration.GetConnectionString("DevFreelaCs");
+builder.Services.AddDbContext<DevFreelaDbContext>(options => options.UseSqlServer(connectionString));
 
 //Injeção de dependendia para as controllers teren acesso aos Services da camada Application
 builder.Services.AddScoped<IProjectService, ProjectService>();
